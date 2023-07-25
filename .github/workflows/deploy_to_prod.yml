@@ -1,0 +1,60 @@
+# Apply Terraform configuration to production environment.
+
+name: Deploy to Prod
+
+on:
+  push:
+    branches:
+      # Trigger the workflow upon changes to main
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Validate Terraform configuration and check for formatting issues
+  validate-terraform-configuration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Install Terraform CLI
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.2
+
+      - name: Prepare Terraform working directory
+        run: terraform init
+
+      - name: Validate Terraform configuration
+        run: terraform validate
+
+      - name: Validate Terraform formatting
+        run: terraform fmt -recursive -check
+
+  # Apply Terraform configuration to dev environment
+  deploy-to-dev:
+    needs: validate-terraform-configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Install Terraform CLI
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.2
+
+      - name: Prepare Terraform working directory
+        run: terraform init
+
+      - name: Create Terraform-managed infrastructure
+        run: terraform apply -auto-approve
+        # Set Terraform environment variables from GitHub Secrets
+        env:
+          TF_VAR_SUMOLOGIC_ACCESSID: ${{ vars.SUMOLOGIC_ACCESSID_PROD }}
+          TF_VAR_SUMOLOGIC_ACCESSKEY: ${{ secrets.SUMOLOGIC_ACCESSKEY_PROD }}
+          TF_VAR_TINES_WEBHOOK_URL_FOR_SUMOLOGIC_ALERTS: ${{ secrets.TINES_WEBHOOK_URL_FOR_SUMOLOGIC_ALERTS }}
