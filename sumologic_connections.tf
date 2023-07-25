@@ -1,5 +1,6 @@
 # sumologic_connection docs: https://registry.terraform.io/providers/SumoLogic/sumologic/latest/docs/resources/connection
 
+# Read the Tines webhook URL from the environment variable TF_VAR_TINES_WEBHOOK_URL_FOR_SUMOLOGIC_ALERTS.
 variable "TINES_WEBHOOK_URL_FOR_SUMOLOGIC_ALERTS" {
   type        = string
   description = "Tines webhook URL to send Sumo Logic alerts to."
