@@ -14,6 +14,7 @@ resource "sumologic_connection" "tines_webhook" {
   description     = "Connection to send alert payloads to Tines webhook."
   url             = var.TINES_WEBHOOK_URL_FOR_SUMOLOGIC_ALERTS
   custom_headers  = { "Content-Type" : "application/json" }
+  # The default payload (JSON string) from Sumo Logic to send to Tines webhook.
   default_payload = <<JSON
 {
   "rule.name": "{{Name}}",
